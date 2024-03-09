@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.example.m13.MainActivity;
 import com.example.m13.models.Cerveza;
 
 import java.util.ArrayList;
@@ -159,31 +161,39 @@ public class DbCervezas extends DbHelper {
 
     public Cerveza verCerveza(int id) {
 
-        DbHelper dbHelper = new DbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        if (existeCerveza(id)) {
 
-        Cerveza cerveza = null;
-        Cursor cursorCervezas = null;
+            DbHelper dbHelper = new DbHelper(context);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        cursorCervezas = db.rawQuery("SELECT * FROM " + TABLE_CERVEZAS + " WHERE id = " + id + " LIMIT 1", null);
+            Cerveza cerveza = null;
+            Cursor cursorCervezas = null;
 
-        if (cursorCervezas.moveToFirst()) {
-            cerveza = new Cerveza();
-            cerveza.setId(cursorCervezas.getInt(0));
-            cerveza.setNombre(cursorCervezas.getString(1));
-            cerveza.setPais(cursorCervezas.getString(2));
-            cerveza.setTipo(cursorCervezas.getString(3));
-            cerveza.setMarca(cursorCervezas.getString(4));
-            cerveza.setPrecio(cursorCervezas.getDouble(5));
-            cerveza.setGraduacion(cursorCervezas.getDouble(6));
+            cursorCervezas = db.rawQuery("SELECT * FROM " + TABLE_CERVEZAS + " WHERE id = " + id + " LIMIT 1", null);
+
+            if (cursorCervezas.moveToFirst()) {
+                cerveza = new Cerveza();
+                cerveza.setId(cursorCervezas.getInt(0));
+                cerveza.setNombre(cursorCervezas.getString(1));
+                cerveza.setPais(cursorCervezas.getString(2));
+                cerveza.setTipo(cursorCervezas.getString(3));
+                cerveza.setMarca(cursorCervezas.getString(4));
+                cerveza.setPrecio(cursorCervezas.getDouble(5));
+                cerveza.setGraduacion(cursorCervezas.getDouble(6));
+            }
+
+            cursorCervezas.close();
+
+            return cerveza;
+        } else {
+            Toast.makeText(context, "No existe ninguna cerveza por el identificador facilitado", Toast.LENGTH_LONG).show();
+            return null;
         }
-
-        cursorCervezas.close();
-
-        return cerveza;
     }
 
     public void editarCerveza(int id, String nombre, String pais, String tipo, String marca, double precio, double graduacion) {
+
+        if(existeCerveza(id)) {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -194,10 +204,14 @@ public class DbCervezas extends DbHelper {
             ex.toString();
         } finally {
             db.close();
+        } } else {
+            Toast.makeText(context, "No existe ninguna cerveza por el identificador facilitado", Toast.LENGTH_LONG).show();
         }
     }
 
     public void eliminarCerveza(int id) {
+
+        if(existeCerveza(id)){
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -207,8 +221,46 @@ public class DbCervezas extends DbHelper {
             ex.toString();
         } finally {
             db.close();
+        } } else {
+            Toast.makeText(context, "No existe ninguna cerveza por el identificador facilitado", Toast.LENGTH_LONG).show();
         }
     }
+
+    public boolean existeCerveza(int id) {
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ArrayList<Cerveza> listaCervezas = new ArrayList<>();
+        Cerveza cerveza = null;
+        Cursor cursorCervezas = null;
+
+        cursorCervezas = db.rawQuery("SELECT * FROM " + TABLE_CERVEZAS, null);
+
+        if (cursorCervezas.moveToFirst()){
+            do{
+                cerveza = new Cerveza();
+                cerveza.setId(cursorCervezas.getInt(0));
+                cerveza.setNombre(cursorCervezas.getString(1));
+                cerveza.setPais(cursorCervezas.getString(2));
+                cerveza.setTipo(cursorCervezas.getString(3));
+                cerveza.setMarca(cursorCervezas.getString(4));
+                cerveza.setPrecio(cursorCervezas.getDouble(5));
+                cerveza.setGraduacion(cursorCervezas.getDouble(6));
+
+                listaCervezas.add(cerveza);
+            } while (cursorCervezas.moveToNext());
+        }
+        cursorCervezas.close();
+
+        for (Cerveza c : listaCervezas) {
+            if (c.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
 }
 
