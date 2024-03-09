@@ -6,7 +6,8 @@ public class Cerveza {
     private String pais;
     private String tipo;
     private String marca;
-    private int precio;
+    private double precio;
+    private double graduacion;
 
     public int getId() {
         return id;
@@ -48,11 +49,15 @@ public class Cerveza {
         this.marca = marca;
     }
 
-    public int getPrecio() {
+    public double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(int precio) {
+    public void setPrecio(double precio) {
         this.precio = precio;
+    }
+    public double getGraduacion(){return graduacion;}
+    public void setGraduacion(double graduacion){
+        this.graduacion = graduacion;
     }
 }

@@ -24,7 +24,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 "pais TEXT NOT NULL," +
                 "tipo TEXT NOT NULL," +
                 "marca TEXT NOT NULL," +
-                "precio INTEGER)");
+                "precio DOUBLE," +
+                "graduacion DOUBLE)");
 
     }
 
